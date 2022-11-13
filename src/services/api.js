@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const apiConfig = {
   API_KEY: '06cf6ee022a0922eb5200ae030143d7b',
@@ -24,6 +25,7 @@ export async function getTrendingMovies(page) {
 
     return res.data;
   } catch (error) {
+    Notify.failure(error.message);
     console.log(error.message);
   }
 }
@@ -36,6 +38,7 @@ export async function getMovieByKey(key, page) {
 
     return res.data;
   } catch (error) {
+    Notify.failure(error.message);
     console.log(error.message);
   }
 }
@@ -48,6 +51,7 @@ export async function getMovieDetails(id) {
 
     return res.data;
   } catch (error) {
+    Notify.failure(error.message);
     console.log(error.message);
   }
 }
@@ -60,10 +64,12 @@ export async function getMovieActors(id) {
 
     return res.data;
   } catch (error) {
+    Notify.failure(error.message);
     console.log(error.message);
   }
 }
 export async function getMovieReviews(id) {
+
   try {
     const res = await axios.get(`${apiConfig.DETAILS}/${id}/reviews`, {
       params: baseSearchParams,
@@ -71,6 +77,7 @@ export async function getMovieReviews(id) {
 
     return res.data;
   } catch (error) {
+    Notify.failure(error.message);
     console.log(error.message);
   }
 }

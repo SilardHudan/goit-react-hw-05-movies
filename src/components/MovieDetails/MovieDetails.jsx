@@ -5,6 +5,7 @@ import { useParams, useLocation, Outlet } from 'react-router-dom';
 import { getMovieDetails } from 'services/api';
 import noPoster from '../../images/img-default.jpg';
 import { getLocalStorage, setLocalStorage } from 'services/localStorage';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import {
   BackLink,
   Content,
@@ -24,22 +25,38 @@ const MovieDetails = () => {
   const [movieDetails, setMovieDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isAddToFavourite, setIsAddToFavourite] = useState(false);
-  const params = useParams();
+  // const params = useParams();
   const location = useLocation();
+  const { movieId } = useParams();
+  // useEffect(() => {
+  //   setLoading(true);
+  //   getMovieDetails(params.movieId)
+  //     .then(setMovieDetails)
+  //     .finally(() => setLoading(false));
+  // }, [params]);
+ 
+  useEffect(() => {
+    (async () => {
+      const movieObj = await getMovieDetails(movieId);
+      setMovieDetails(movieObj);
+      // console.log(movieObj);
+
+      try {
+      } catch (error) {
+        Notify.failure(error.message);
+        } finally {
+        setLoading(false);
+      }
+    })();
+  }, [movieId]);
 
   useEffect(() => {
-    setLoading(true);
-    getMovieDetails(params.movieId)
-      .then(setMovieDetails)
-      .finally(() => setLoading(false));
-  }, [params]);
-
-  useEffect(() => {
+    if (!movieDetails) return;
     const savedData = getLocalStorage('favourite');
-    if (savedData && savedData.some(data => data.id === movieDetails?.id)) {
+    if (savedData && savedData.some((data) => data.id === movieDetails.id)) {
       setIsAddToFavourite(true);
     }
-  }, [movieDetails?.id]);
+  }, [movieDetails]);
 
   function addFavourite() {
     const isAded = setLocalStorage('favourite', movieDetails);
@@ -58,6 +75,7 @@ const MovieDetails = () => {
   const voteAverage = Math.floor(vote_average * 10);
   const genresStr = genres.map(genre => genre.name).join(' ');
   const backLink = location.state?.from ?? '/movies';
+ 
 
   return (
     <Container>
@@ -117,3 +135,4 @@ const MovieDetails = () => {
 };
 
 export default MovieDetails;
+

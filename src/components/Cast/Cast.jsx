@@ -5,6 +5,8 @@ import { getMovieActors } from 'services/api';
 import { CastItem, CastList, Character, Img, Name } from './Cast.styled';
 import noPoster from '../../images/no-poster.jpg';
 import PropTypes from 'prop-types';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { animateScroll } from 'react-scroll';
 
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w780';
 
@@ -13,14 +15,31 @@ const Cast = () => {
   const [loading, setLoading] = useState(false);
   const { movieId } = useParams();
 
-  useEffect(() => {
-    setLoading(true);
-    getMovieActors(movieId)
-      .then(setActors)
-      .finally(() => setLoading(false));
-  }, [movieId]);
+  // useEffect(() => {
+  //   setLoading(true);
+  //   getMovieActors(movieId)
+  //     .then(setActors)
+  //     .finally(() => setLoading(false));
+  // }, [movieId]);
 
+  // if (!actors) {
+  //   return <>{loading && <Loader />}</>;
+  // }
+    useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const dataActors = await getMovieActors(movieId);
+        setActors(dataActors);
+      } catch (error) {
+        Notify.failure(error.message);
+      } finally {
+        setLoading(false);
+  }
+    })();
+  }, [movieId]);
   if (!actors) {
+    animateScroll.scrollMore(400);
     return <>{loading && <Loader />}</>;
   }
 
